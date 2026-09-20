@@ -1831,6 +1831,20 @@ document
             error
           );
 
+          const resultId =
+            type === "ask" ? "ask-result" :
+            type === "translate" ? "translate-result" :
+            type === "summarize" ? "summarize-result" :
+            "rewrite-result";
+
+          showResult(
+            resultId,
+            "⚠️ " + (
+              error?.message ||
+              "AI Gateway request failed."
+            )
+          );
+
         }finally{
 
           this.disabled=false;
