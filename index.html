@@ -1575,83 +1575,104 @@ document
   });
 
 /* =========================================================
-   MOCK AI SERVICE
+   SECURE AI GATEWAY
    ========================================================= */
+
+const GATEWAY_URL =
+  window.NONONICK_GATEWAY_URL ||
+  localStorage.getItem("nononick-ai-gateway") ||
+  "/api/chat";
+
+async function gatewayRequest(payload){
+
+  const response = await fetch(
+    GATEWAY_URL,
+    {
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify(payload)
+    }
+  );
+
+  let data = null;
+
+  try{
+    data = await response.json();
+  }catch(error){
+    throw new Error(
+      "Gateway returned an invalid response."
+    );
+  }
+
+  if(!response.ok){
+    throw new Error(
+      data?.error ||
+      "AI Gateway request failed."
+    );
+  }
+
+  if(!data?.text){
+    throw new Error(
+      "AI Gateway returned no AI text."
+    );
+  }
+
+  return data.text;
+}
 
 const AIService = {
 
   async ask(text){
 
-    await delay(500);
-
     if(!text.trim()){
-
       return "Please enter a question first.";
-
     }
 
-    return (
-      "NONONICK AI is ready.\n\n" +
-      "Your secure AI Gateway is not connected yet.\n\n" +
-      "Once the gateway is connected, " +
-      "this request will be sent to your selected AI model."
-    );
+    return gatewayRequest({
+      mode:"ask",
+      text
+    });
   },
 
   async translate(text,from,to){
 
-    await delay(500);
-
     if(!text.trim()){
-
       return "Please enter text to translate.";
-
     }
 
-    return (
-      "Translation preview\n\n" +
-      "Source: "+from+"\n" +
-      "Target: "+to+"\n\n" +
-      text
-    );
+    return gatewayRequest({
+      mode:"translate",
+      text,
+      sourceLanguage:from,
+      targetLanguage:to
+    });
   },
 
   async summarize(text){
 
-    await delay(500);
-
     if(!text.trim()){
-
       return "Please enter text to summarize.";
-
     }
 
-    return (
-      "Summary preview\n\n" +
-      "The real AI summarization engine " +
-      "will become active after the secure " +
-      "AI Gateway is connected.\n\n" +
+    return gatewayRequest({
+      mode:"summarize",
       text
-    );
+    });
   },
 
   async rewrite(text,style){
 
-    await delay(500);
-
     if(!text.trim()){
-
       return "Please enter text to rewrite.";
-
     }
 
-    return (
-      "Rewrite preview\n\n" +
-      "Style: "+style+"\n\n" +
-      "The real rewriting engine will be " +
-      "connected through the secure AI Gateway.\n\n" +
-      text
-    );
+    return gatewayRequest({
+      mode:"rewrite",
+      text,
+      style
+    });
   }
 
 };
