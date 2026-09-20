@@ -1,0 +1,1905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#02030a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>NONONICK AI</title>
+
+<style>
+/* =========================================================
+   NONONICK AI — SINGLE FILE
+   HTML5 + CSS3 + VANILLA JS
+   ========================================================= */
+
+:root{
+  --cyan:#38efff;
+  --blue:#4e7cff;
+  --purple:#a35cff;
+  --violet:#6d3dff;
+  --white:#f7fbff;
+  --muted:rgba(240,248,255,.55);
+  --glass:rgba(13,17,34,.72);
+  --glass2:rgba(255,255,255,.075);
+  --border:rgba(255,255,255,.14);
+  --bg:#02030a;
+}
+
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+  width:100%;
+  height:100%;
+  margin:0;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 50% 35%,#16134b 0%,#08091a 35%,#02030a 75%);
+  color:var(--white);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",
+               "SF Pro Text","Segoe UI",sans-serif;
+  overscroll-behavior:none;
+}
+
+body{
+  position:relative;
+  user-select:none;
+  -webkit-user-select:none;
+}
+
+button,
+input,
+textarea,
+select{
+  font:inherit;
+}
+
+button{
+  -webkit-appearance:none;
+  appearance:none;
+}
+
+#app{
+  position:fixed;
+  inset:0;
+  overflow:hidden;
+  isolation:isolate;
+}
+
+/* =========================================================
+   BACKGROUND
+   ========================================================= */
+
+.background{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  overflow:hidden;
+}
+
+.aurora{
+  position:absolute;
+  width:65vw;
+  height:65vw;
+  min-width:300px;
+  min-height:300px;
+  border-radius:50%;
+  filter:blur(70px);
+  opacity:.18;
+  mix-blend-mode:screen;
+}
+
+.aurora.a{
+  left:-20%;
+  top:5%;
+  background:radial-gradient(circle,#167dff,transparent 65%);
+  animation:auroraA 14s ease-in-out infinite alternate;
+}
+
+.aurora.b{
+  right:-25%;
+  bottom:-5%;
+  background:radial-gradient(circle,#9b35ff,transparent 65%);
+  animation:auroraB 17s ease-in-out infinite alternate;
+}
+
+.grid{
+  position:absolute;
+  inset:-30%;
+  opacity:.08;
+  background-image:
+    linear-gradient(rgba(85,220,255,.3) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(85,220,255,.3) 1px,transparent 1px);
+  background-size:45px 45px;
+  transform:perspective(700px) rotateX(65deg) translateY(25%);
+  transform-origin:center;
+}
+
+.noise{
+  position:absolute;
+  inset:0;
+  opacity:.035;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+  pointer-events:none;
+}
+
+/* =========================================================
+   PARTICLES
+   ========================================================= */
+
+.particles{
+  position:absolute;
+  inset:0;
+  overflow:hidden;
+  pointer-events:none;
+}
+
+.particle{
+  position:absolute;
+  width:2px;
+  height:2px;
+  border-radius:50%;
+  background:#8df8ff;
+  box-shadow:0 0 9px #38efff;
+  opacity:.5;
+  animation:particleFloat linear infinite;
+}
+
+/* =========================================================
+   ORB
+   ========================================================= */
+
+.ai-orb{
+  position:fixed;
+  left:calc(100% - 92px);
+  top:calc(100% - 170px);
+
+  width:68px;
+  height:68px;
+
+  border-radius:50%;
+  z-index:10000;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  cursor:grab;
+  touch-action:none;
+
+  background:
+    radial-gradient(circle at 32% 25%,
+      rgba(255,255,255,.42),
+      rgba(110,240,255,.18) 20%,
+      rgba(85,75,255,.20) 48%,
+      rgba(3,5,18,.86) 76%);
+
+  border:1px solid rgba(255,255,255,.3);
+
+  backdrop-filter:blur(20px) saturate(190%);
+  -webkit-backdrop-filter:blur(20px) saturate(190%);
+
+  box-shadow:
+    0 0 12px rgba(56,239,255,.95),
+    0 0 30px rgba(62,120,255,.8),
+    0 0 62px rgba(163,92,255,.6),
+    inset 0 0 22px rgba(255,255,255,.1);
+
+  animation:orbFloat 4s ease-in-out infinite;
+  will-change:left,top,transform;
+}
+
+.ai-orb::before{
+  content:"";
+  position:absolute;
+  inset:-7px;
+  border-radius:50%;
+  border:1px solid rgba(56,239,255,.42);
+  box-shadow:
+    0 0 18px rgba(56,239,255,.55),
+    0 0 40px rgba(163,92,255,.3);
+  animation:orbRing 2.6s ease-in-out infinite;
+}
+
+.ai-orb::after{
+  content:"";
+  position:absolute;
+  inset:-22px;
+  border-radius:50%;
+  background:radial-gradient(circle,
+    rgba(56,239,255,.18),
+    rgba(163,92,255,.08) 40%,
+    transparent 72%);
+  filter:blur(8px);
+  pointer-events:none;
+}
+
+.orb-core{
+  position:absolute;
+  width:31px;
+  height:31px;
+  border-radius:50%;
+  background:
+    radial-gradient(circle at 33% 27%,
+      #fff 0 8%,
+      #a7ffff 17%,
+      #38efff 40%,
+      #7051ff 68%,
+      #210b59 100%);
+  box-shadow:
+    0 0 10px #b7ffff,
+    0 0 25px #38efff,
+    0 0 45px rgba(128,65,255,.95);
+  animation:corePulse 2.1s ease-in-out infinite;
+}
+
+.orb-glow{
+  position:absolute;
+  width:50px;
+  height:50px;
+  border-radius:50%;
+  background:radial-gradient(circle,
+    rgba(80,240,255,.3),
+    rgba(140,60,255,.16) 45%,
+    transparent 72%);
+  filter:blur(5px);
+}
+
+.orb-ring{
+  position:absolute;
+  inset:5px;
+  border-radius:50%;
+  border:1px solid rgba(130,245,255,.28);
+  box-shadow:inset 0 0 16px rgba(0,220,255,.25);
+  animation:ringRotate 8s linear infinite;
+}
+
+.orb-symbol{
+  position:relative;
+  z-index:4;
+  font-size:17px;
+  color:white;
+  text-shadow:
+    0 0 5px white,
+    0 0 13px var(--cyan),
+    0 0 25px var(--purple);
+}
+
+.ai-orb.dragging{
+  animation:none;
+  cursor:grabbing;
+  transform:scale(1.14);
+  box-shadow:
+    0 0 20px #38efff,
+    0 0 48px rgba(70,100,255,1),
+    0 0 90px rgba(190,50,255,.8),
+    inset 0 0 25px rgba(255,255,255,.18);
+}
+
+/* =========================================================
+   AI PANEL
+   ========================================================= */
+
+.ai-panel{
+  position:fixed;
+  left:50%;
+  bottom:max(18px,env(safe-area-inset-bottom));
+
+  width:min(430px,calc(100vw - 24px));
+  max-height:calc(100vh - 36px);
+
+  padding:21px;
+  border-radius:30px;
+
+  z-index:9000;
+
+  opacity:0;
+  pointer-events:none;
+
+  transform:translate(-50%,35px) scale(.92);
+
+  background:
+    linear-gradient(145deg,
+      rgba(25,31,58,.86),
+      rgba(5,8,22,.78));
+
+  border:1px solid rgba(255,255,255,.15);
+
+  backdrop-filter:blur(32px) saturate(185%);
+  -webkit-backdrop-filter:blur(32px) saturate(185%);
+
+  box-shadow:
+    0 30px 90px rgba(0,0,0,.7),
+    0 0 35px rgba(56,239,255,.12),
+    0 0 85px rgba(163,92,255,.13),
+    inset 0 1px 0 rgba(255,255,255,.11);
+
+  transition:
+    opacity .3s ease,
+    transform .45s cubic-bezier(.2,.8,.2,1);
+
+  overflow:auto;
+  scrollbar-width:none;
+}
+
+.ai-panel::-webkit-scrollbar{
+  display:none;
+}
+
+.ai-panel.open{
+  opacity:1;
+  pointer-events:auto;
+  transform:translate(-50%,0) scale(1);
+}
+
+.panel-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:25px;
+}
+
+.panel-brand{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:2px;
+}
+
+.panel-status{
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:var(--cyan);
+  box-shadow:
+    0 0 8px var(--cyan),
+    0 0 18px var(--cyan);
+  animation:statusPulse 1.8s ease-in-out infinite;
+}
+
+.close-panel{
+  width:34px;
+  height:34px;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:50%;
+  background:rgba(255,255,255,.06);
+  color:rgba(255,255,255,.72);
+  font-size:23px;
+  line-height:1;
+  cursor:pointer;
+}
+
+.close-panel:active{
+  transform:scale(.9);
+}
+
+.panel-greeting small{
+  display:block;
+  margin-bottom:8px;
+  font-size:10px;
+  letter-spacing:3px;
+  color:rgba(72,235,255,.85);
+}
+
+.panel-greeting h1{
+  margin:0;
+  font-size:29px;
+  line-height:1.1;
+  letter-spacing:-.8px;
+  background:linear-gradient(90deg,#fff,#91f7ff,#a875ff);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+
+.panel-greeting p{
+  margin:10px 0 23px;
+  color:var(--muted);
+  font-size:13px;
+}
+
+/* =========================================================
+   ACTIONS
+   ========================================================= */
+
+.ai-actions{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+}
+
+.ai-action{
+  min-height:76px;
+  display:flex;
+  align-items:center;
+  gap:11px;
+  padding:12px;
+  border-radius:19px;
+  border:1px solid rgba(255,255,255,.09);
+  background:
+    linear-gradient(145deg,
+      rgba(255,255,255,.075),
+      rgba(255,255,255,.025));
+  color:white;
+  text-align:left;
+  cursor:pointer;
+  transition:
+    transform .2s ease,
+    border-color .2s ease,
+    box-shadow .2s ease,
+    background .2s ease;
+}
+
+.ai-action:hover{
+  transform:translateY(-3px);
+  border-color:rgba(56,239,255,.35);
+  background:
+    linear-gradient(145deg,
+      rgba(56,239,255,.11),
+      rgba(163,92,255,.1));
+  box-shadow:
+    0 9px 28px rgba(56,239,255,.1);
+}
+
+.ai-action:active{
+  transform:scale(.96);
+}
+
+.action-icon{
+  width:38px;
+  height:38px;
+  flex:0 0 38px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:13px;
+  font-size:17px;
+  background:
+    linear-gradient(135deg,
+      rgba(56,239,255,.16),
+      rgba(163,92,255,.16));
+  border:1px solid rgba(100,220,255,.15);
+  box-shadow:inset 0 0 12px rgba(255,255,255,.04);
+}
+
+.ai-action span:last-child{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  min-width:0;
+}
+
+.ai-action strong{
+  font-size:13px;
+  font-weight:650;
+}
+
+.ai-action small{
+  font-size:10px;
+  color:rgba(255,255,255,.43);
+}
+
+/* =========================================================
+   TOOL VIEW
+   ========================================================= */
+
+.tool-view{
+  display:none;
+  margin-top:20px;
+  animation:toolIn .3s ease both;
+}
+
+.tool-view.active{
+  display:block;
+}
+
+.tool-title{
+  margin:0 0 13px;
+  font-size:18px;
+}
+
+.tool-subtitle{
+  margin:-5px 0 15px;
+  color:var(--muted);
+  font-size:12px;
+}
+
+.field{
+  margin-bottom:11px;
+}
+
+.field label{
+  display:block;
+  margin-bottom:7px;
+  color:rgba(255,255,255,.55);
+  font-size:10px;
+  letter-spacing:1.2px;
+}
+
+.text-field,
+.select-field{
+  width:100%;
+  border:1px solid rgba(255,255,255,.11);
+  border-radius:15px;
+  outline:none;
+  color:white;
+  background:rgba(0,0,0,.22);
+  box-shadow:inset 0 0 15px rgba(0,0,0,.15);
+}
+
+.text-field{
+  min-height:110px;
+  padding:13px;
+  resize:none;
+}
+
+.text-field:focus,
+.select-field:focus{
+  border-color:rgba(56,239,255,.55);
+  box-shadow:
+    0 0 18px rgba(56,239,255,.12),
+    inset 0 0 15px rgba(0,0,0,.2);
+}
+
+.select-field{
+  height:44px;
+  padding:0 11px;
+}
+
+.tool-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
+}
+
+.tool-button{
+  width:100%;
+  min-height:45px;
+  border:1px solid rgba(56,239,255,.2);
+  border-radius:14px;
+  color:white;
+  background:
+    linear-gradient(135deg,
+      rgba(56,239,255,.16),
+      rgba(130,70,255,.18));
+  cursor:pointer;
+  box-shadow:0 0 20px rgba(56,239,255,.06);
+}
+
+.tool-button:active{
+  transform:scale(.97);
+}
+
+.tool-result{
+  display:none;
+  margin-top:12px;
+  padding:14px;
+  border-radius:15px;
+  border:1px solid rgba(255,255,255,.09);
+  background:rgba(0,0,0,.2);
+  color:rgba(255,255,255,.78);
+  font-size:13px;
+  line-height:1.6;
+  white-space:pre-wrap;
+}
+
+.tool-result.show{
+  display:block;
+}
+
+.back-button{
+  width:100%;
+  margin-top:10px;
+  min-height:40px;
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:13px;
+  color:rgba(255,255,255,.65);
+  background:rgba(255,255,255,.045);
+}
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.panel-footer{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-top:18px;
+  font-size:9px;
+  letter-spacing:2px;
+  color:rgba(255,255,255,.3);
+}
+
+.footer-dot{
+  width:5px;
+  height:5px;
+  border-radius:50%;
+  background:var(--cyan);
+  box-shadow:0 0 8px var(--cyan);
+}
+
+/* =========================================================
+   KEYFRAMES
+   ========================================================= */
+
+@keyframes orbFloat{
+  0%,100%{margin-top:0}
+  50%{margin-top:-7px}
+}
+
+@keyframes corePulse{
+  0%,100%{
+    transform:scale(.92);
+    filter:brightness(1);
+  }
+  50%{
+    transform:scale(1.08);
+    filter:brightness(1.35);
+  }
+}
+
+@keyframes orbRing{
+  0%,100%{
+    opacity:.4;
+    transform:scale(.96);
+  }
+  50%{
+    opacity:1;
+    transform:scale(1.04);
+  }
+}
+
+@keyframes ringRotate{
+  to{transform:rotate(360deg)}
+}
+
+@keyframes statusPulse{
+  0%,100%{opacity:.45}
+  50%{opacity:1}
+}
+
+@keyframes auroraA{
+  from{transform:translate(-5%,-3%) scale(1)}
+  to{transform:translate(20%,12%) scale(1.2)}
+}
+
+@keyframes auroraB{
+  from{transform:translate(5%,5%) scale(1)}
+  to{transform:translate(-18%,-12%) scale(1.25)}
+}
+
+@keyframes particleFloat{
+  from{
+    transform:translate3d(0,20px,0);
+    opacity:0;
+  }
+  15%{opacity:.5}
+  85%{opacity:.35}
+  to{
+    transform:translate3d(25px,-100vh,0);
+    opacity:0;
+  }
+}
+
+@keyframes toolIn{
+  from{
+    opacity:0;
+    transform:translateY(8px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media(max-width:480px){
+
+  .ai-panel{
+    width:calc(100vw - 20px);
+    padding:19px;
+    border-radius:27px;
+  }
+
+  .panel-greeting h1{
+    font-size:27px;
+  }
+
+  .ai-actions{
+    gap:9px;
+  }
+
+  .ai-action{
+    min-height:72px;
+    padding:11px;
+  }
+
+  .action-icon{
+    width:35px;
+    height:35px;
+    flex-basis:35px;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media(prefers-reduced-motion:reduce){
+
+  *,
+  *::before,
+  *::after{
+    animation-duration:.001ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.001ms !important;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div id="app">
+
+  <div class="background">
+    <div class="aurora a"></div>
+    <div class="aurora b"></div>
+    <div class="grid"></div>
+    <div class="noise"></div>
+    <div class="particles" id="particles"></div>
+  </div>
+
+  <!-- =====================================================
+       AI ORB
+       ===================================================== -->
+
+  <div
+    id="ai-orb"
+    class="ai-orb"
+    role="button"
+    tabindex="0"
+    aria-label="Open NONONICK AI"
+  >
+    <div class="orb-core"></div>
+    <div class="orb-glow"></div>
+    <div class="orb-ring"></div>
+    <span class="orb-symbol">✦</span>
+  </div>
+
+  <!-- =====================================================
+       AI PANEL
+       ===================================================== -->
+
+  <section
+    id="ai-panel"
+    class="ai-panel"
+    aria-hidden="true"
+  >
+
+    <div class="panel-header">
+
+      <div class="panel-brand">
+        <span class="panel-status"></span>
+        <span>NONONICK AI</span>
+      </div>
+
+      <button
+        id="close-panel"
+        class="close-panel"
+        aria-label="Close"
+      >×</button>
+
+    </div>
+
+    <div class="panel-greeting">
+      <small>AI ASSISTANT</small>
+      <h1>How can I help?</h1>
+      <p>Your personal AI control center.</p>
+    </div>
+
+    <div
+      id="home-actions"
+      class="ai-actions"
+    >
+
+      <button class="ai-action" data-tool="ask">
+        <span class="action-icon">✦</span>
+        <span>
+          <strong>Ask AI</strong>
+          <small>Ask anything</small>
+        </span>
+      </button>
+
+      <button class="ai-action" data-tool="translate">
+        <span class="action-icon">文</span>
+        <span>
+          <strong>Translate</strong>
+          <small>Translate instantly</small>
+        </span>
+      </button>
+
+      <button class="ai-action" data-tool="summarize">
+        <span class="action-icon">☷</span>
+        <span>
+          <strong>Summarize</strong>
+          <small>Make it shorter</small>
+        </span>
+      </button>
+
+      <button class="ai-action" data-tool="rewrite">
+        <span class="action-icon">✎</span>
+        <span>
+          <strong>Rewrite</strong>
+          <small>Improve your text</small>
+        </span>
+      </button>
+
+    </div>
+
+    <!-- ASK -->
+    <div
+      id="tool-ask"
+      class="tool-view"
+    >
+      <h2 class="tool-title">Ask AI</h2>
+      <p class="tool-subtitle">
+        Ask anything. Your secure AI gateway will be connected later.
+      </p>
+
+      <div class="field">
+        <label>YOUR QUESTION</label>
+        <textarea
+          id="ask-input"
+          class="text-field"
+          placeholder="Type your question..."
+        ></textarea>
+      </div>
+
+      <button
+        class="tool-button"
+        data-run="ask"
+      >ASK AI</button>
+
+      <div
+        id="ask-result"
+        class="tool-result"
+      ></div>
+
+      <button class="back-button">
+        ← Back
+      </button>
+    </div>
+
+    <!-- TRANSLATE -->
+    <div
+      id="tool-translate"
+      class="tool-view"
+    >
+      <h2 class="tool-title">Translate</h2>
+      <p class="tool-subtitle">
+        Translate your text between languages.
+      </p>
+
+      <div class="field">
+        <label>SOURCE TEXT</label>
+        <textarea
+          id="translate-input"
+          class="text-field"
+          placeholder="Enter text..."
+        ></textarea>
+      </div>
+
+      <div class="tool-row">
+
+        <select
+          id="source-language"
+          class="select-field"
+        >
+          <option>Auto Detect</option>
+          <option>English</option>
+          <option>Persian</option>
+          <option>German</option>
+          <option>Arabic</option>
+          <option>French</option>
+        </select>
+
+        <select
+          id="target-language"
+          class="select-field"
+        >
+          <option>Persian</option>
+          <option>English</option>
+          <option>German</option>
+          <option>Arabic</option>
+          <option>French</option>
+        </select>
+
+      </div>
+
+      <br>
+
+      <button
+        class="tool-button"
+        data-run="translate"
+      >TRANSLATE</button>
+
+      <div
+        id="translate-result"
+        class="tool-result"
+      ></div>
+
+      <button class="back-button">
+        ← Back
+      </button>
+    </div>
+
+    <!-- SUMMARIZE -->
+    <div
+      id="tool-summarize"
+      class="tool-view"
+    >
+      <h2 class="tool-title">Summarize</h2>
+      <p class="tool-subtitle">
+        Turn long text into a concise summary.
+      </p>
+
+      <div class="field">
+        <label>TEXT</label>
+        <textarea
+          id="summarize-input"
+          class="text-field"
+          placeholder="Paste your text..."
+        ></textarea>
+      </div>
+
+      <button
+        class="tool-button"
+        data-run="summarize"
+      >SUMMARIZE</button>
+
+      <div
+        id="summarize-result"
+        class="tool-result"
+      ></div>
+
+      <button class="back-button">
+        ← Back
+      </button>
+    </div>
+
+    <!-- REWRITE -->
+    <div
+      id="tool-rewrite"
+      class="tool-view"
+    >
+      <h2 class="tool-title">Rewrite</h2>
+      <p class="tool-subtitle">
+        Rewrite text in a different style.
+      </p>
+
+      <div class="field">
+        <label>TEXT</label>
+        <textarea
+          id="rewrite-input"
+          class="text-field"
+          placeholder="Write or paste your text..."
+        ></textarea>
+      </div>
+
+      <div class="field">
+
+        <label>STYLE</label>
+
+        <select
+          id="rewrite-style"
+          class="select-field"
+        >
+          <option>Clear</option>
+          <option>Friendly</option>
+          <option>Formal</option>
+          <option>Creative</option>
+          <option>Concise</option>
+        </select>
+
+      </div>
+
+      <button
+        class="tool-button"
+        data-run="rewrite"
+      >REWRITE</button>
+
+      <div
+        id="rewrite-result"
+        class="tool-result"
+      ></div>
+
+      <button class="back-button">
+        ← Back
+      </button>
+    </div>
+
+    <div class="panel-footer">
+      <span class="footer-dot"></span>
+      <span>AI READY • GATEWAY OFFLINE</span>
+    </div>
+
+  </section>
+
+</div>
+
+<script>
+/* =========================================================
+   NONONICK AI — APPLICATION ENGINE
+   ========================================================= */
+
+(function(){
+
+"use strict";
+
+/* =========================================================
+   DOM
+   ========================================================= */
+
+const orb =
+  document.getElementById("ai-orb");
+
+const panel =
+  document.getElementById("ai-panel");
+
+const closePanel =
+  document.getElementById("close-panel");
+
+const homeActions =
+  document.getElementById("home-actions");
+
+const particles =
+  document.getElementById("particles");
+
+/* =========================================================
+   STATE
+   ========================================================= */
+
+const STORAGE_KEY =
+  "nononick-ai-orb-position";
+
+let pointerId = null;
+let dragging = false;
+
+let startX = 0;
+let startY = 0;
+
+let offsetX = 0;
+let offsetY = 0;
+
+const DRAG_THRESHOLD = 8;
+
+/* =========================================================
+   PARTICLES
+   ========================================================= */
+
+function createParticles(){
+
+  if(!particles) return;
+
+  const count =
+    window.innerWidth < 600 ? 32 : 55;
+
+  const fragment =
+    document.createDocumentFragment();
+
+  for(let i=0;i<count;i++){
+
+    const p =
+      document.createElement("span");
+
+    p.className = "particle";
+
+    p.style.left =
+      Math.random()*100 + "%";
+
+    p.style.top =
+      (Math.random()*100 + 100) + "%";
+
+    p.style.animationDuration =
+      (8 + Math.random()*16) + "s";
+
+    p.style.animationDelay =
+      (-Math.random()*18) + "s";
+
+    p.style.opacity =
+      (.15 + Math.random()*.45);
+
+    fragment.appendChild(p);
+  }
+
+  particles.appendChild(fragment);
+}
+
+createParticles();
+
+/* =========================================================
+   POSITION
+   ========================================================= */
+
+function clamp(value,min,max){
+  return Math.max(min,Math.min(value,max));
+}
+
+function setOrbPosition(x,y){
+
+  const width =
+    orb.offsetWidth;
+
+  const height =
+    orb.offsetHeight;
+
+  const maxX =
+    Math.max(8,
+      window.innerWidth-width-8);
+
+  const maxY =
+    Math.max(8,
+      window.innerHeight-height-8);
+
+  x =
+    clamp(x,8,maxX);
+
+  y =
+    clamp(y,8,maxY);
+
+  orb.style.left =
+    x + "px";
+
+  orb.style.top =
+    y + "px";
+
+  return {x,y};
+}
+
+function savePosition(x,y){
+
+  try{
+
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({x,y})
+    );
+
+  }catch(error){}
+
+}
+
+function restorePosition(){
+
+  let saved = null;
+
+  try{
+
+    saved =
+      JSON.parse(
+        localStorage.getItem(
+          STORAGE_KEY
+        )
+      );
+
+  }catch(error){}
+
+  if(
+    saved &&
+    typeof saved.x === "number" &&
+    typeof saved.y === "number"
+  ){
+
+    setOrbPosition(
+      saved.x,
+      saved.y
+    );
+
+    return;
+  }
+
+  setOrbPosition(
+    window.innerWidth-
+      orb.offsetWidth-
+      24,
+
+    window.innerHeight-
+      orb.offsetHeight-
+      110
+  );
+}
+
+/* =========================================================
+   SNAP
+   ========================================================= */
+
+function snapToEdge(){
+
+  const rect =
+    orb.getBoundingClientRect();
+
+  const maxX =
+    window.innerWidth-
+    rect.width;
+
+  const maxY =
+    window.innerHeight-
+    rect.height;
+
+  const distances = {
+    left:rect.left,
+    right:maxX-rect.left,
+    top:rect.top,
+    bottom:maxY-rect.top
+  };
+
+  const edge =
+    Object.keys(distances)
+      .reduce((a,b)=>
+        distances[a] <
+        distances[b]
+          ? a
+          : b
+      );
+
+  let x = rect.left;
+  let y = rect.top;
+
+  if(edge==="left") x=8;
+  if(edge==="right") x=maxX-8;
+  if(edge==="top") y=8;
+  if(edge==="bottom") y=maxY-8;
+
+  orb.style.transition =
+    "left .45s cubic-bezier(.2,.8,.2,1)," +
+    "top .45s cubic-bezier(.2,.8,.2,1)";
+
+  const pos =
+    setOrbPosition(x,y);
+
+  savePosition(
+    pos.x,
+    pos.y
+  );
+
+  setTimeout(()=>{
+    orb.style.transition="";
+  },500);
+}
+
+/* =========================================================
+   PANEL
+   ========================================================= */
+
+function openPanel(){
+
+  panel.classList.add("open");
+
+  panel.setAttribute(
+    "aria-hidden",
+    "false"
+  );
+}
+
+function closeAIPanel(){
+
+  panel.classList.remove("open");
+
+  panel.setAttribute(
+    "aria-hidden",
+    "true"
+  );
+}
+
+/* =========================================================
+   ORB POINTER DOWN
+   ========================================================= */
+
+orb.addEventListener(
+  "pointerdown",
+  function(event){
+
+    if(
+      event.button !== undefined &&
+      event.button !== 0
+    ){
+      return;
+    }
+
+    pointerId =
+      event.pointerId;
+
+    dragging=false;
+
+    startX =
+      event.clientX;
+
+    startY =
+      event.clientY;
+
+    const rect =
+      orb.getBoundingClientRect();
+
+    offsetX =
+      event.clientX-
+      rect.left;
+
+    offsetY =
+      event.clientY-
+      rect.top;
+
+    try{
+      orb.setPointerCapture(
+        pointerId
+      );
+    }catch(error){}
+
+  }
+);
+
+/* =========================================================
+   ORB POINTER MOVE
+   ========================================================= */
+
+orb.addEventListener(
+  "pointermove",
+  function(event){
+
+    if(
+      pointerId === null ||
+      event.pointerId !== pointerId
+    ){
+      return;
+    }
+
+    const dx =
+      event.clientX-startX;
+
+    const dy =
+      event.clientY-startY;
+
+    const distance =
+      Math.sqrt(
+        dx*dx+dy*dy
+      );
+
+    if(
+      !dragging &&
+      distance < DRAG_THRESHOLD
+    ){
+      return;
+    }
+
+    if(!dragging){
+
+      dragging=true;
+
+      orb.classList.add(
+        "dragging"
+      );
+    }
+
+    setOrbPosition(
+      event.clientX-offsetX,
+      event.clientY-offsetY
+    );
+
+  }
+);
+
+/* =========================================================
+   ORB POINTER UP
+   ========================================================= */
+
+orb.addEventListener(
+  "pointerup",
+  function(event){
+
+    if(
+      pointerId === null ||
+      event.pointerId !== pointerId
+    ){
+      return;
+    }
+
+    const wasDragging =
+      dragging;
+
+    dragging=false;
+
+    orb.classList.remove(
+      "dragging"
+    );
+
+    try{
+      orb.releasePointerCapture(
+        pointerId
+      );
+    }catch(error){}
+
+    pointerId=null;
+
+    if(wasDragging){
+
+      snapToEdge();
+
+    }else{
+
+      openPanel();
+
+    }
+
+  }
+);
+
+/* =========================================================
+   POINTER CANCEL
+   ========================================================= */
+
+orb.addEventListener(
+  "pointercancel",
+  function(){
+
+    dragging=false;
+
+    orb.classList.remove(
+      "dragging"
+    );
+
+    pointerId=null;
+
+    snapToEdge();
+
+  }
+);
+
+/* =========================================================
+   CLOSE
+   ========================================================= */
+
+closePanel.addEventListener(
+  "click",
+  function(event){
+
+    event.stopPropagation();
+
+    closeAIPanel();
+
+  }
+);
+
+/* =========================================================
+   ESC
+   ========================================================= */
+
+document.addEventListener(
+  "keydown",
+  function(event){
+
+    if(
+      event.key === "Escape"
+    ){
+      closeAIPanel();
+    }
+
+  }
+);
+
+/* =========================================================
+   TOOL NAVIGATION
+   ========================================================= */
+
+function showTool(name){
+
+  homeActions.style.display =
+    "none";
+
+  document
+    .querySelectorAll(".tool-view")
+    .forEach(view=>{
+      view.classList.remove(
+        "active"
+      );
+    });
+
+  const target =
+    document.getElementById(
+      "tool-"+name
+    );
+
+  if(target){
+
+    target.classList.add(
+      "active"
+    );
+
+  }
+}
+
+function showHome(){
+
+  document
+    .querySelectorAll(".tool-view")
+    .forEach(view=>{
+      view.classList.remove(
+        "active"
+      );
+    });
+
+  homeActions.style.display =
+    "grid";
+}
+
+/* =========================================================
+   TOOL BUTTONS
+   ========================================================= */
+
+document
+  .querySelectorAll("[data-tool]")
+  .forEach(button=>{
+
+    button.addEventListener(
+      "click",
+      function(){
+
+        showTool(
+          this.dataset.tool
+        );
+
+      }
+    );
+
+  });
+
+document
+  .querySelectorAll(".back-button")
+  .forEach(button=>{
+
+    button.addEventListener(
+      "click",
+      showHome
+    );
+
+  });
+
+/* =========================================================
+   MOCK AI SERVICE
+   ========================================================= */
+
+const AIService = {
+
+  async ask(text){
+
+    await delay(500);
+
+    if(!text.trim()){
+
+      return "Please enter a question first.";
+
+    }
+
+    return (
+      "NONONICK AI is ready.\n\n" +
+      "Your secure AI Gateway is not connected yet.\n\n" +
+      "Once the gateway is connected, " +
+      "this request will be sent to your selected AI model."
+    );
+  },
+
+  async translate(text,from,to){
+
+    await delay(500);
+
+    if(!text.trim()){
+
+      return "Please enter text to translate.";
+
+    }
+
+    return (
+      "Translation preview\n\n" +
+      "Source: "+from+"\n" +
+      "Target: "+to+"\n\n" +
+      text
+    );
+  },
+
+  async summarize(text){
+
+    await delay(500);
+
+    if(!text.trim()){
+
+      return "Please enter text to summarize.";
+
+    }
+
+    return (
+      "Summary preview\n\n" +
+      "The real AI summarization engine " +
+      "will become active after the secure " +
+      "AI Gateway is connected.\n\n" +
+      text
+    );
+  },
+
+  async rewrite(text,style){
+
+    await delay(500);
+
+    if(!text.trim()){
+
+      return "Please enter text to rewrite.";
+
+    }
+
+    return (
+      "Rewrite preview\n\n" +
+      "Style: "+style+"\n\n" +
+      "The real rewriting engine will be " +
+      "connected through the secure AI Gateway.\n\n" +
+      text
+    );
+  }
+
+};
+
+function delay(ms){
+
+  return new Promise(
+    resolve =>
+      setTimeout(resolve,ms)
+  );
+
+}
+
+/* =========================================================
+   RESULT
+   ========================================================= */
+
+function showResult(
+  id,
+  text
+){
+
+  const result =
+    document.getElementById(id);
+
+  if(!result) return;
+
+  result.textContent =
+    text;
+
+  result.classList.add(
+    "show"
+  );
+
+}
+
+/* =========================================================
+   RUN ASK
+   ========================================================= */
+
+document
+  .querySelectorAll("[data-run]")
+  .forEach(button=>{
+
+    button.addEventListener(
+      "click",
+      async function(){
+
+        const type =
+          this.dataset.run;
+
+        this.disabled=true;
+
+        const original =
+          this.textContent;
+
+        this.textContent =
+          "PROCESSING...";
+
+        try{
+
+          if(type==="ask"){
+
+            const input =
+              document.getElementById(
+                "ask-input"
+              ).value;
+
+            const result =
+              await AIService.ask(
+                input
+              );
+
+            showResult(
+              "ask-result",
+              result
+            );
+          }
+
+          if(type==="translate"){
+
+            const input =
+              document.getElementById(
+                "translate-input"
+              ).value;
+
+            const from =
+              document.getElementById(
+                "source-language"
+              ).value;
+
+            const to =
+              document.getElementById(
+                "target-language"
+              ).value;
+
+            const result =
+              await AIService.translate(
+                input,
+                from,
+                to
+              );
+
+            showResult(
+              "translate-result",
+              result
+            );
+          }
+
+          if(type==="summarize"){
+
+            const input =
+              document.getElementById(
+                "summarize-input"
+              ).value;
+
+            const result =
+              await AIService.summarize(
+                input
+              );
+
+            showResult(
+              "summarize-result",
+              result
+            );
+          }
+
+          if(type==="rewrite"){
+
+            const input =
+              document.getElementById(
+                "rewrite-input"
+              ).value;
+
+            const style =
+              document.getElementById(
+                "rewrite-style"
+              ).value;
+
+            const result =
+              await AIService.rewrite(
+                input,
+                style
+              );
+
+            showResult(
+              "rewrite-result",
+              result
+            );
+          }
+
+        }catch(error){
+
+          console.error(
+            "NONONICK AI error:",
+            error
+          );
+
+        }finally{
+
+          this.disabled=false;
+
+          this.textContent =
+            original;
+
+        }
+
+      }
+    );
+
+  });
+
+/* =========================================================
+   ORB KEYBOARD ACCESS
+   ========================================================= */
+
+orb.addEventListener(
+  "keydown",
+  function(event){
+
+    if(
+      event.key === "Enter" ||
+      event.key === " "
+    ){
+
+      event.preventDefault();
+
+      openPanel();
+
+    }
+
+  }
+);
+
+/* =========================================================
+   RESIZE
+   ========================================================= */
+
+window.addEventListener(
+  "resize",
+  function(){
+
+    const rect =
+      orb.getBoundingClientRect();
+
+    setOrbPosition(
+      rect.left,
+      rect.top
+    );
+
+    snapToEdge();
+
+  }
+);
+
+/* =========================================================
+   VISIBILITY
+   ========================================================= */
+
+document.addEventListener(
+  "visibilitychange",
+  function(){
+
+    if(
+      document.hidden
+    ){
+
+      orb.style.animationPlayState =
+        "paused";
+
+    }else{
+
+      orb.style.animationPlayState =
+        "running";
+
+    }
+
+  }
+);
+
+/* =========================================================
+   INIT
+   ========================================================= */
+
+restorePosition();
+
+})();
+</script>
+
+</body>
+</html>
